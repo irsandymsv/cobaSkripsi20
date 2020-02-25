@@ -216,6 +216,7 @@ class HistogramController extends Controller
       Auth::logout();
       return redirect()->route('histogram.login');
    }
+   
 
 
    private function embedding($path_image, $peak, $zero, $bin_message, $user_id)
@@ -956,7 +957,7 @@ class HistogramController extends Controller
       echo "<br>";
    	
    	/* NOTE: 
-   	format $message = EMAIL[space]PASSWORD[sapce]OVERHEAD_INFOLSB_ASLI0000000...(karna message < dr max_point)
+   	format $message = [EMAIL][ ][PASSWORD][ ][OVERHEAD_INFO][LSB_ASLI][0000000...](karna message < dr max_point)
    	*/
 
    	//Ambil pesan alsi, LSB asli 16 pixel pertama, dan overhead info (jika ada)
@@ -991,12 +992,6 @@ class HistogramController extends Controller
 					break;
    			}
 			}
-
-         // if ($space_count == 3) {
-         //    $mulai = $i + 8;
-         //    $key_LSB_asli = substr($message, $mulai, 16);
-         //    break;
-         // }
 
    		$pesan_asli .= $char;
    	}

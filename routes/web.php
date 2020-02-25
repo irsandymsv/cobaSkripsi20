@@ -78,3 +78,15 @@ Route::prefix('histogram')->name('histogram.')->group(function()
 	Route::get('/dashboard', 'HistogramController@dashboard')->name('dashboard');
 	Route::get('/logout', 'HistogramController@logout')->name('logout');
 });
+
+Route::prefix('histogram2')->name('histogram2.')->group(function()
+{
+	Route::get('/register', 'Histogram2Controller@register')->name('register');
+	Route::post('/store_user', 'Histogram2Controller@store_user')->name('store.user');
+	Route::get('/login', 'Histogram2Controller@login')->name('login');
+	Route::post('/checkLogin', 'Histogram2Controller@checkLogin')->name('checkLogin');
+	Route::get('/dashboard', 'Histogram2Controller@dashboard')->name('dashboard');
+	Route::get('/logout', 'Histogram2Controller@logout')->name('logout');
+	Route::get('/view_histogram', 'Histogram2Controller@view_histogram')->name('view_histogram');
+	Route::post('/show_histogram', 'Histogram2Controller@show_histogram')->name('show_histogram');
+});
