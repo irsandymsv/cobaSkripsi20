@@ -153,7 +153,8 @@ class Histogram2Controller extends Controller
 
    public function dashboard()
    {
-      return view('histogram2.dashboard');
+      $histogram = [];
+      return view('histogram2.dashboard', ['histogram' => $histogram]);
    }
 
    public function logout()

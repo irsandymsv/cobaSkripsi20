@@ -90,3 +90,9 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 	Route::get('/view_histogram', 'Histogram2Controller@view_histogram')->name('view_histogram');
 	Route::post('/show_histogram', 'Histogram2Controller@show_histogram')->name('show_histogram');
 });
+
+Route::prefix('test-image')->name('test_image.')->group(function()
+{
+	Route::get('/', 'testImageController@index')->name('index');
+	Route::post('/test', 'testImageController@test')->name('test');
+});

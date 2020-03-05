@@ -39,8 +39,11 @@
 			<br>
 		</div>
 	</div>
-	@for ($i = 0; $i < 256; $i++)
-		{{ $histogram[$i] }}<span>  </span>
-	@endfor	
+	@if (count($histogram) > 0)
+		@for ($i = 0; $i < 256; $i++)
+			{{ $histogram[$i] }}<span>  </span>
+		@endfor	
+	@endif
+	
 </body>
 </html>
