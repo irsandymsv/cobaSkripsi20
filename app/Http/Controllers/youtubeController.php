@@ -26,13 +26,13 @@ class youtubeController extends Controller
    {
       $this->client = new Google_Client();
     	$this->client->setApplicationName('API code samples');
-    	$this->client->setDeveloperKey('AIzaSyCvKp8kILDK1biQ61Bdzg5eTqy7eELcw2E'); 
+    	$this->client->setDeveloperKey('INSERT_YOUR_API_KEY_HERE'); 
     	// Define service object for making API requests.
     	$this->service = new Google_Service_YouTube($this->client);
 
     	//Stemmer
-    	$stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
-    	$this->stemmer  = $stemmerFactory->createStemmer();
+    	// $stemmerFactory = new \Sastrawi\Stemmer\StemmerFactory();
+    	// $this->stemmer  = $stemmerFactory->createStemmer();
    }
 
 	public function searchVideo()
@@ -77,12 +77,12 @@ class youtubeController extends Controller
    	foreach ($response['modelData']['items'] as $item) {
    		$nama_user = $item['snippet']['topLevelComment']['snippet']['authorDisplayName'];
    		$komentar = $item['snippet']['topLevelComment']['snippet']['textOriginal'];
-   		$komen_stem = $this->stemmer->stem($komentar);
+   		// $komen_stem = $this->stemmer->stem($komentar);
 
    		echo "*"."<br>";
     		echo "nama: ".$nama_user."<br>";
     		echo "komen: ".$komentar."<br>";
-    		echo "komen stemmer: ".$komen_stem."<br>";
+    		// echo "komen stemmer: ".$komen_stem."<br>";
     		// echo "jml balasan: ".$item['snippet']['totalReplyCount']."<br>";
     		echo "<br>";
     	}

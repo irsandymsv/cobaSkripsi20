@@ -95,4 +95,6 @@ Route::prefix('test-image')->name('test_image.')->group(function()
 {
 	Route::get('/', 'testImageController@index')->name('index');
 	Route::post('/test', 'testImageController@test')->name('test');
+	Route::get('/histogram', 'testImageController@chart_histogram')->name('chart.histogram');
+	Route::post('/histogram', 'testImageController@get_histogram')->name('get.histogram');
 });

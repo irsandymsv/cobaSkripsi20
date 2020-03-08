@@ -88,4 +88,41 @@ class testImageController extends Controller
     	$psnr = 10 * log10($ratio);
     	return $psnr;
 	}
+
+   public function chart_histogram()
+   {
+      return view('test_image.chart_histogram');
+   }
+
+   public function get_histogram(Request $request)
+   {
+      // return $request;
+      $gambar1 = $request->file('gambar1');
+      $extensi = $gambar1->getClientOriginalExtension();
+      $image1 = '';
+      if ($extensi == "jpeg" || $extensi == "jpg") {
+         $image1 = imagecreatefromjpeg($gambar1->path());
+      }
+      elseif ($extensi == "png") {
+         $image1 = imagecreatefrompng($gambar1->path()); 
+      }
+
+      $gambar2 = $request->file('gambar2');
+      $extensi = $gambar2->getClientOriginalExtension();
+      $image2 = '';
+      if ($extensi == "jpeg" || $extensi == "jpg") {
+         $image2 = imagecreatefromjpeg($gambar2->path());
+      }
+      elseif ($extensi == "png") {
+         $image2 = imagecreatefrompng($gambar2->path()); 
+      }
+
+      $histo1 = $this->makeHistogram($image1);
+      $histo2 = $this->makeHistogram($image2);
+      $histogram = [
+         0 => $histo1,
+         1 => $histo2,
+      ];
+      return $histogram;
+   }
 }

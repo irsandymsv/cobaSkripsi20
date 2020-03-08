@@ -163,26 +163,6 @@ class Histogram2Controller extends Controller
       return redirect()->route('histogram2.login');
    }
 
-   private function makeHistogram($image)
-   {
-   	$histogram = [];
-   	$width = imagesx($image);
-      $height = imagesy($image);
-      for ($i=0; $i <= 255; $i++) { 
-         $histogram[$i] = 0;
-      }
-
-      for ($y=0; $y < $height; $y++) { 
-         for ($x=0; $x < $width; $x++) { 
-            $rgb = imagecolorat($image, $x, $y);
-            $r = ($rgb >> 16) & 0xFF;
-            $histogram[$r]++;
-         }
-      }
-
-      return $histogram;
-   }
-
    public function view_histogram()
    {
       return view('histogram2.view_histogram');
