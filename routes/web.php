@@ -19,6 +19,8 @@ Route::get('/stem', 'stemmerController@index')->name('stemmer');
 
 Route::get('/youtube/searchVideo', 'youtubeController@searchVideo')->name('youtube.searchVideo');
 Route::get('/youtube/getComment/{videoId?}', 'youtubeController@getComment')->name('youtube.getComment');
+
+//Stegano LSB
 Route::prefix('stegano')->name('stegano.')->group(function ()
 {
 	Route::get('/', 'steganoController@index')->name('index');
@@ -34,34 +36,9 @@ Route::prefix('stegano')->name('stegano.')->group(function ()
 	Route::post('/check_token/{id_user}', 'steganoController@check_token')->name('check_token');
 });
 
-Route::get('/tes', function()
-{
-	$time = time();
-	$text = $time."QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm?!@%&#$,./;";
-	// $md5pass = md5($text);
-	var_dump(md5($text));  
-	echo "<br>";
-	var_dump(md5($time));
-
-	// $pass = Hash::make(time(), [
-	// 	'rounds' => 5
-	// ]);
-	// var_dump($pass);
-	// echo "<br>"."new Pass: "."<br>";
-	// $newPass = Hash::make($pass, [
-	// 	'rounds' => 5
-	// ]);
-	// var_dump($newPass);
-});
-
-Route::get('/timediff', function()
-{
-	echo Carbon\Carbon::now()->diffInSeconds(Carbon\Carbon::parse('2020-02-11 21:41:47'));
-});
 
 
-
-//Histogram Shifting
+//Stegano Histogram Shifting
 Route::prefix('histogram')->name('histogram.')->group(function()
 {
 	Route::get('/', 'HistogramController@index')->name('index');
@@ -97,4 +74,40 @@ Route::prefix('test-image')->name('test_image.')->group(function()
 	Route::post('/test', 'testImageController@test')->name('test');
 	Route::get('/histogram', 'testImageController@chart_histogram')->name('chart.histogram');
 	Route::post('/histogram', 'testImageController@get_histogram')->name('get.histogram');
+});
+
+
+
+Route::get('/tes-hash', function()
+{
+	$time = time();
+	$text = $time."QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm?!@%&#$,./;";
+	// $md5pass = md5($text);
+	var_dump(md5($text));  
+	echo "<br>";
+	var_dump(md5($time));
+
+	// $pass = Hash::make(time(), [
+	// 	'rounds' => 5
+	// ]);
+	// var_dump($pass);
+	// echo "<br>"."new Pass: "."<br>";
+	// $newPass = Hash::make($pass, [
+	// 	'rounds' => 5
+	// ]);
+	// var_dump($newPass);
+});
+
+Route::get('/timediff', function()
+{
+	echo Carbon\Carbon::now()->diffInSeconds(Carbon\Carbon::parse('2020-02-11 21:41:47'));
+});
+
+Route::get('/hash-image', function ()
+{
+	$file1 = storage_path('app/public/temp_image/contoh_gambar.jpg');
+	$file2 = storage_path('app/public/temp_image/hasil_histogram.png');
+	$hashing1 = hash_file('md5', $file1);
+	$hashing2 = hash_file('md5', $file2);
+	echo "hashing file 1 : ".$hashing1."<br>"."hashing file 2 : ".$hashing2;
 });
