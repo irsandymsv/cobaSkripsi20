@@ -9,6 +9,11 @@ use App\User;
 
 class Histogram2Controller extends Controller
 {
+   public function index()
+   {
+      return view('histogram2.index');
+   }
+
    public function register()
    {
       return view('histogram2.register');

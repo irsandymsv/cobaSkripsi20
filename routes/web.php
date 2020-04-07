@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Encryption\DecryptException;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -58,6 +59,7 @@ Route::prefix('histogram')->name('histogram.')->group(function()
 
 Route::prefix('histogram2')->name('histogram2.')->group(function()
 {
+	Route::get('/', 'Histogram2Controller@index')->name('index');
 	Route::get('/register', 'Histogram2Controller@register')->name('register');
 	Route::post('/store_user', 'Histogram2Controller@store_user')->name('store.user');
 	Route::get('/login', 'Histogram2Controller@login')->name('login');
@@ -76,7 +78,11 @@ Route::prefix('test-image')->name('test_image.')->group(function()
 	Route::post('/histogram', 'testImageController@get_histogram')->name('get.histogram');
 });
 
-
+Route::prefix('rsa')->name('rsa.')->group(function()
+{
+	Route::get('/keygen', 'RSAController@generate_key')->name('keygen');
+	Route::get('/login', 'RSAController@view_login')->name('login');
+});
 
 Route::get('/tes-hash', function()
 {
@@ -110,4 +116,18 @@ Route::get('/hash-image', function ()
 	$hashing1 = hash_file('md5', $file1);
 	$hashing2 = hash_file('md5', $file2);
 	echo "hashing file 1 : ".$hashing1."<br>"."hashing file 2 : ".$hashing2;
+});
+
+Route::get('/kripto', function ()
+{
+	$msg = "irsandymsv98@gmail.com password12345";
+	$chip = encrypt($msg);
+	echo $chip."<br><br>";
+
+	$real_msg = decrypt($chip);
+	echo "dekripsi: "."<br>".$real_msg;
+	// try {
+	// } catch (DecryptException $e) {
+	// 	echo $e;
+	// }
 });
