@@ -39,11 +39,11 @@
 			<br>
 		</div>
 	</div>
-	@if (count($histogram) > 0)
+	{{-- @if (count($histogram) > 0)
 		@for ($i = 0; $i < 256; $i++)
 			{{ $histogram[$i] }}<span>  </span>
 		@endfor	
-	@endif
+	@endif --}}
 	
 </body>
 </html>

@@ -145,10 +145,14 @@ class Histogram2Controller extends Controller
       $user_info = $this->ekstraksi($image);
       // dd($user_info);
 
+      if ($user_info == "error_cover") {
+         return redirect()->back()->with('error_cover', "Gambar tidak dapat digunakan. Pastikan gambar yang digunakan adalah gambar cover yang didapat ketika registrasi");
+      }
+
       if (Auth::attempt(['email' => $user_info[0], 'password' => $user_info[1]])) {
          // Auth::login($user);
          // return redirect()->route('histogram2.dashboard');
-         return view('histogram2.dashboard', ['histogram' => $user_info[2]]);
+         return redirect()->route('histogram2.dashboard');
       }
       else{
          return redirect()->back()->with('not_found', "Akun tidak ditemukan. Harap gunakan gambar cover yang anda dapat ketika registrasi.");
@@ -158,8 +162,8 @@ class Histogram2Controller extends Controller
 
    public function dashboard()
    {
-      $histogram = [];
-      return view('histogram2.dashboard', ['histogram' => $histogram]);
+      // $histogram = [];
+      return view('histogram2.dashboard');
    }
 
    public function logout()
@@ -361,194 +365,202 @@ class Histogram2Controller extends Controller
       $bin_message = '';
       $user_info = '';
 
-      /*extract max dan min index 
-      */
-      $bin_key = '';
-      $bin_peak = '';
-      $bin_zero = '';
-      for ($y=0; $y < 1; $y++) { 
-         for ($x=0; $x < 16; $x++) { 
-            $rgb = imagecolorat($cover_photo, $x, $y);
-            $r = ($rgb >> 16) & 0xFF;
-            $bin_r = $this->integerToBin($r);
-            $bin_key .= $bin_r[strlen($bin_r) - 1];
-         }
-      }
-
-      $bin_peak = substr($bin_key, 0, 8);
-      $bin_zero = substr($bin_key, 8, 8);
-      $peak = bindec($bin_peak);
-      $zero = bindec($bin_zero);
-
-      //Ekstrak pesan yg disisipkan
-      if ($peak < $zero) { //jika peak di sebelah kiri zero
-         for ($y=0; $y < $height; $y++) { 
-            for ($x=0; $x < $width; $x++) { 
-               if ($y == 0) { 
-                  if ($x >= 0 && $x < 16) {
-                     //cek apakah pixel termasuk 16 pertama, jika ya lewati
-                     continue;
-                  }
-               }
-
+      try {
+         /*extract max dan min index 
+         */
+         $bin_key = '';
+         $bin_peak = '';
+         $bin_zero = '';
+         for ($y=0; $y < 1; $y++) { 
+            for ($x=0; $x < 16; $x++) { 
                $rgb = imagecolorat($cover_photo, $x, $y);
                $r = ($rgb >> 16) & 0xFF;
+               $bin_r = $this->integerToBin($r);
+               $bin_key .= $bin_r[strlen($bin_r) - 1];
+            }
+         }
 
-               if ($r == $peak) {
-                  $bin_message .= "0";
-               }
-               elseif ($r == ($peak + 1)) {
-                  $bin_message .= "1";
-               }
-               elseif ($r == $zero) {
-                  $min_point++;
+         $bin_peak = substr($bin_key, 0, 8);
+         $bin_zero = substr($bin_key, 8, 8);
+         $peak = bindec($bin_peak);
+         $zero = bindec($bin_zero);
+
+         //Ekstrak pesan yg disisipkan
+         if ($peak < $zero) { //jika peak di sebelah kiri zero
+            for ($y=0; $y < $height; $y++) { 
+               for ($x=0; $x < $width; $x++) { 
+                  if ($y == 0) { 
+                     if ($x >= 0 && $x < 16) {
+                        //cek apakah pixel termasuk 16 pertama, jika ya lewati
+                        continue;
+                     }
+                  }
+
+                  $rgb = imagecolorat($cover_photo, $x, $y);
+                  $r = ($rgb >> 16) & 0xFF;
+
+                  if ($r == $peak) {
+                     $bin_message .= "0";
+                  }
+                  elseif ($r == ($peak + 1)) {
+                     $bin_message .= "1";
+                  }
+                  elseif ($r == $zero) {
+                     $min_point++;
+                  }
                }
             }
          }
-      }
-      elseif ($peak > $zero){ //jika peak di sebelah kanan zero
-         for ($y=0; $y < $height; $y++) { 
-            for ($x=0; $x < $width; $x++) { 
-               if ($y == 0) { 
-                  if ($x >= 0 && $x < 16) {
-                     //cek apakah pixel termasuk 16 pertama, jika ya lewati
-                     continue;
+         elseif ($peak > $zero){ //jika peak di sebelah kanan zero
+            for ($y=0; $y < $height; $y++) { 
+               for ($x=0; $x < $width; $x++) { 
+                  if ($y == 0) { 
+                     if ($x >= 0 && $x < 16) {
+                        //cek apakah pixel termasuk 16 pertama, jika ya lewati
+                        continue;
+                     }
                   }
-               }
 
-               $rgb = imagecolorat($cover_photo, $x, $y);
-               $r = ($rgb >> 16) & 0xFF;
+                  $rgb = imagecolorat($cover_photo, $x, $y);
+                  $r = ($rgb >> 16) & 0xFF;
 
-               if ($r == $peak) {
-                  $bin_message .= "0";
-               }
-               elseif ($r == ($peak - 1)) {
-                  $bin_message .= "1";
-               }
-               elseif ($r == $zero) {
-                  $min_point++;
+                  if ($r == $peak) {
+                     $bin_message .= "0";
+                  }
+                  elseif ($r == ($peak - 1)) {
+                     $bin_message .= "1";
+                  }
+                  elseif ($r == $zero) {
+                     $min_point++;
+                  }
                }
             }
          }
-      }
-      else{
-         echo "Max index dan Min index tidak boleh sama. Failed";
-         die();
+         else{
+            return "error_cover";
+            // echo "Max index dan Min index tidak boleh sama. Failed";
+            // die();
+         }
+
+         
+         /* NOTE: 
+         format $message = EMAIL[space]PASSWORD[sapce]OVERHEAD_INFO0000000...(karna message < dr max_point)
+         */
+
+         //Ambil pesan asli dan overhead info (jika ada)
+         $message_len = strlen($bin_message);
+         $pesan_asli = '';
+         $overhead_info = '';
+         $key_LSB_asli = '';
+         $space_count = 0;
+         for ($i=0; ($i + 7) < $message_len; $i += 8) { 
+            $bin_part = substr($bin_message, $i, 8);
+            $char = pack('H*', dechex(bindec($bin_part)));
+            // echo $char."<br>";   
+
+            if ($char == " ") {
+               $space_count++;
+            }
+
+            if ($space_count == 2) { 
+               //setelah space ke dua adalah overhead info atau LSB
+
+               if ($min_point > 0) { //cek apakah ada Overhead Info
+                  $mulai = $i + 8;
+                  $overhead_info = substr($bin_message, $mulai, $min_point);
+                  $mulai = $mulai + $min_point;
+                  $key_LSB_asli = substr($bin_message, $mulai, 16);
+
+                  break;
+               }
+               else{ 
+                  $mulai = $i + 8;
+                  $key_LSB_asli = substr($bin_message, $mulai, 16);
+                  break;
+               }
+            }
+
+            $pesan_asli .= $char;
+         }
+
+         /*set LSB asli ke 16 pixel pertama
+         */
+         for ($y=0; $y < 1; $y++) { 
+            for ($x=0; $x < 16; $x++) { 
+               $rgb = imagecolorat($cover_photo, $x, $y);
+               $r = ($rgb >> 16) & 0xFF;
+               $g = ($rgb >> 8) & 0xFF;
+               $b = $rgb & 0xFF;
+
+               $newR = $this->integerToBin($r);
+               $newR[strlen($newR) - 1] = $key_LSB_asli[$x]; // ganti LSB 16 pixel pertama dg yg LSB asli
+               $newR = bindec($newR);
+
+               $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
+               imagesetpixel($cover_photo, $x, $y, $newColor);
+            }
+         }
+
+         //Shift Back 
+         $index = 0;
+         if ($peak < $zero) { //jika max index lbh kecil, geser ke kiri
+            for ($y=0; $y < $height; $y++) { 
+               for ($x=0; $x < $width; $x++) { 
+                  $rgb = imagecolorat($cover_photo, $x, $y);
+                  $r = ($rgb >> 16) & 0xFF;
+                  $g = ($rgb >> 8) & 0xFF;
+                  $b = $rgb & 0xFF;
+
+                  if ($r > $peak && $r < $zero) {
+                     $newR = $r - 1;
+                     $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
+                     imagesetpixel($cover_photo, $x, $y, $newColor);
+                  }
+                  elseif ($r == $zero) {
+                     if ((int)$overhead_info[$index] == 1) {
+                        $newR = $r - 1;
+                        $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
+                        imagesetpixel($cover_photo, $x, $y, $newColor);    
+                     }
+                     $index++;
+                  }
+               }
+            }
+         }
+         else {
+            for ($y=0; $y < $height; $y++) { //jika max index lbh besar, geser ke kanan
+               for ($x=0; $x < $width; $x++) { 
+                  $rgb = imagecolorat($cover_photo, $x, $y);
+                  $r = ($rgb >> 16) & 0xFF;
+                  $g = ($rgb >> 8) & 0xFF;
+                  $b = $rgb & 0xFF;
+
+                  if ($r < $peak && $r > $zero) {
+                     $newR = $r + 1;
+                     $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
+                     imagesetpixel($cover_photo, $x, $y, $newColor);
+                  }
+                  elseif ($r == $zero) {
+                     if ((int)$overhead_info[$index] == 1) {
+                        $newR = $r + 1;
+                        $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
+                        imagesetpixel($cover_photo, $x, $y, $newColor);    
+                     }
+                     $index++;
+                  }
+               }
+            }
+         }
+         // imagedestroy($cover_photo);
+         // $histogram = $this->makeHistogram($cover_photo);
+         $user_info = explode(" ", $pesan_asli);
+         // $user_info[] = $histogram;
+         return $user_info;
+      } 
+      catch (Exception $e) {
+         return "error_cover";
       }
 
       
-      /* NOTE: 
-      format $message = EMAIL[space]PASSWORD[sapce]OVERHEAD_INFO0000000...(karna message < dr max_point)
-      */
-
-      //Ambil pesan asli dan overhead info (jika ada)
-      $message_len = strlen($bin_message);
-      $pesan_asli = '';
-      $overhead_info = '';
-      $key_LSB_asli = '';
-      $space_count = 0;
-      for ($i=0; ($i + 7) < $message_len; $i += 8) { 
-         $bin_part = substr($bin_message, $i, 8);
-         $char = pack('H*', dechex(bindec($bin_part)));
-         // echo $char."<br>";   
-
-         if ($char == " ") {
-            $space_count++;
-         }
-
-         if ($space_count == 2) { 
-            //setelah space ke dua adalah overhead info atau LSB
-
-            if ($min_point > 0) { //cek apakah ada Overhead Info
-               $mulai = $i + 8;
-               $overhead_info = substr($bin_message, $mulai, $min_point);
-               $mulai = $mulai + $min_point;
-               $key_LSB_asli = substr($bin_message, $mulai, 16);
-
-               break;
-            }
-            else{ 
-               $mulai = $i + 8;
-               $key_LSB_asli = substr($bin_message, $mulai, 16);
-               break;
-            }
-         }
-
-         $pesan_asli .= $char;
-      }
-
-      /*set LSB asli ke 16 pixel pertama
-      */
-      for ($y=0; $y < 1; $y++) { 
-         for ($x=0; $x < 16; $x++) { 
-            $rgb = imagecolorat($cover_photo, $x, $y);
-            $r = ($rgb >> 16) & 0xFF;
-            $g = ($rgb >> 8) & 0xFF;
-            $b = $rgb & 0xFF;
-
-            $newR = $this->integerToBin($r);
-            $newR[strlen($newR) - 1] = $key_LSB_asli[$x]; // ganti LSB 16 pixel pertama dg yg LSB asli
-            $newR = bindec($newR);
-
-            $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
-            imagesetpixel($cover_photo, $x, $y, $newColor);
-         }
-      }
-
-      //Shift Back 
-      $index = 0;
-      if ($peak < $zero) { //jika max index lbh kecil, geser ke kiri
-         for ($y=0; $y < $height; $y++) { 
-            for ($x=0; $x < $width; $x++) { 
-               $rgb = imagecolorat($cover_photo, $x, $y);
-               $r = ($rgb >> 16) & 0xFF;
-               $g = ($rgb >> 8) & 0xFF;
-               $b = $rgb & 0xFF;
-
-               if ($r > $peak && $r < $zero) {
-                  $newR = $r - 1;
-                  $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
-                  imagesetpixel($cover_photo, $x, $y, $newColor);
-               }
-               elseif ($r == $zero) {
-                  if ((int)$overhead_info[$index] == 1) {
-                     $newR = $r - 1;
-                     $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
-                     imagesetpixel($cover_photo, $x, $y, $newColor);    
-                  }
-                  $index++;
-               }
-            }
-         }
-      }
-      else {
-         for ($y=0; $y < $height; $y++) { //jika max index lbh besar, geser ke kanan
-            for ($x=0; $x < $width; $x++) { 
-               $rgb = imagecolorat($cover_photo, $x, $y);
-               $r = ($rgb >> 16) & 0xFF;
-               $g = ($rgb >> 8) & 0xFF;
-               $b = $rgb & 0xFF;
-
-               if ($r < $peak && $r > $zero) {
-                  $newR = $r + 1;
-                  $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
-                  imagesetpixel($cover_photo, $x, $y, $newColor);
-               }
-               elseif ($r == $zero) {
-                  if ((int)$overhead_info[$index] == 1) {
-                     $newR = $r + 1;
-                     $newColor = imagecolorallocate($cover_photo, $newR, $g, $b);
-                     imagesetpixel($cover_photo, $x, $y, $newColor);    
-                  }
-                  $index++;
-               }
-            }
-         }
-      }
-      // imagedestroy($cover_photo);
-      $histogram = $this->makeHistogram($cover_photo);
-      $user_info = explode(" ", $pesan_asli);
-      $user_info[] = $histogram;
-      return $user_info;
    }
 }

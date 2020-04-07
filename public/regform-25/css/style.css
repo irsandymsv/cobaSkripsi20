@@ -114,10 +114,11 @@ h3 {
 
     span.lnr-calendar-full {
     position: absolute;
-    left: 18px;
-    font-size: 15px;
+    left: 25px;
+    top: 45px; 
+    font-size: 18px;
     color: #666;
-    top: 43px; }
+    }
 
 .form-control {
   border: 1px solid #e6e6e6;
@@ -165,7 +166,7 @@ button {
   border: none;
   width: 173px;
   height: 42px;
-  margin-top: 30px;
+  margin-top: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -215,7 +216,7 @@ button {
     background-position: center center; } }
 @media (max-width: 991px) {
   .inner {
-    width: 85%; } }
+    width: 85%; margin: auto;} }
 @media (max-width: 767px) {
   .inner {
     width: 100%;
