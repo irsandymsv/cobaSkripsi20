@@ -69,6 +69,18 @@
 	  margin: unset;
 	  /*margin-top: 10px;*/
 	}
+
+	@media only screen and (max-width: 991px) {
+	  .inner {
+	   	width: 85%;
+	 	} 
+	}
+	
+	@media only screen and (max-width: 767px) {
+	  .inner {
+	    width: 100%;
+	  }
+	}
 </style>
 @endsection
 
@@ -115,7 +127,7 @@
 				</div>
 				<br>
 				<div style="text-align: center;">
-					<span>Kehilangan gambar cover ? Gunakan <a href="{{ route('histogram2.index') }}">Recovery Gambar Cover</a> untuk mendapatkan gambar cover baru</span>
+					<span>Kehilangan gambar cover ? Gunakan <a href="{{ route('histogram2.pemulihan_gambar') }}">Recovery Gambar Cover</a> untuk mendapatkan gambar cover baru</span>
 				</div>
 			</form>
 		</div>

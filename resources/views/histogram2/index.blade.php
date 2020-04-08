@@ -106,7 +106,7 @@
 								<div class="col-sm-6">
 									<label for="tgl_lahir">Tanggal Lahir</label>
 									<span class="lnr lnr-calendar-full"></span>
-									<input type="text" name="tgl_lahir" class="form-control datepicker-here" data-language='id' data-date-format="dd M yyyy" id="dp1" value="{{ old('tgl_lahir') }}">
+									<input type="text" name="tgl_lahir" class="form-control datepicker-here" data-language='id' data-date-format="dd-mm-yyyy" id="dp1" autocomplete="off" value="{{ old('tgl_lahir') }}">
 
 									@error('tgl_lahir')
 										<span class="invalid-feedback" role="alert" style="color: red;">
@@ -134,7 +134,7 @@
 								<div class="col-sm-6">
 									<label for="cover_photo">Cover Photo</label>
 									<input type="file" name="cover_photo" class="form-control" accept="image/jpeg,image/png">
-									<small>Foto ini akan digunakan sebagai media Log In</small><br>
+									<small>Gambar ini akan digunakan sebagai media Log In</small><br>
 
 									@error('cover_photo')
 										<span style="color: red;">
@@ -172,5 +172,11 @@
 <!-- DATE-PICKER -->
 <script src="{{asset('/regform-25/vendor/date-picker/js/datepicker.js')}}"></script>
 <script src="{{asset('/regform-25/vendor/date-picker/js/datepicker.en.js')}}"></script>
-<script src="{{asset('/regform-25/js/main.js')}}"></script>
+{{-- <script src="{{asset('/regform-25/js/main.js')}}"></script> --}}
+<script type="text/javascript">
+	$(function() {
+		var dp1 = $('#dp1').datepicker().data('datepicker');
+		// dp1.selectDate(new Date();
+	});
+</script>
 @endsection

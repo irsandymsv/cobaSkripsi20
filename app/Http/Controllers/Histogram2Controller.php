@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Contracts\Encryption\DecryptException;
 use App\User;
+use App\recovery_image;
+use Carbon\Carbon;
+use App\Mail\recoveryImage;
 
 class Histogram2Controller extends Controller
 {
@@ -160,6 +165,57 @@ class Histogram2Controller extends Controller
 
    }
 
+
+   //RECOVERY
+   public function pemulihan_gambar()
+   {
+      return view('histogram2.pemulihan_gambar');
+   }
+
+   public function send_recovery(Request $request)
+   {
+      $this->validate($request, [
+         'email' => 'required|email',
+         'tgl_lahir' => 'required'
+      ]);
+
+      $tgl_lahir = Carbon::parse($request->input('tgl_lahir'));
+      $user = User::where([
+         ['email', $request->input('email')],
+         ['tgl_lahir', $tgl_lahir]
+      ])->first();
+
+      if (is_null($user)) {
+         return redirect()->back()->with('akun_tidak_ada', 'Akun tidak ditemukan. Harap periksa kembali email dan tanggal lahir yang anda masukkan')->withInput();
+      }
+      else{
+         $recovery = recovery_image::create([
+            'user_id' => $user->id
+         ]);
+         $time = time();
+         $code = $time."-".$recovery->id;
+         $code = encrypt($code);
+         MAil::to($request->input('email'))->send(new recoveryImage($code, $user->nama));
+
+         return redirect()->back()->with('email_send', 'Email pemulihan telah dikirimkan ke alamat email anda. Silahkan periksa email anda.')->withInput();
+      }
+      // $tgl = Carbon::createFromFormat('d F Y', $request->tgl_lahir, 'Asia/Jakarta');
+
+   }
+
+   public function reset_cover($code)
+   {
+      $decode = decrypt($code);
+      echo $decode;
+      // return view('histogram2.reset_cover');
+   }
+
+   public function update_cover(Request $request)
+   {
+
+   }
+
+
    public function dashboard()
    {
       // $histogram = [];
@@ -197,6 +253,7 @@ class Histogram2Controller extends Controller
    }
 
 
+   //EMBEDDING
    private function embedding($image, $peak, $zero, $bin_message, $user_id)
    {
       $width = imagesx($image);
@@ -356,7 +413,7 @@ class Histogram2Controller extends Controller
 
 
 
-
+   //EKSTRAKSI
    private function ekstraksi($cover_photo)
    {
       $width = imagesx($cover_photo);

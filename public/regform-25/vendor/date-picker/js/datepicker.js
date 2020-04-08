@@ -14,7 +14,7 @@
             classes: '',
             inline: false,
             language: 'ru',
-            startDate: new Date(),
+            startDate: false,
             firstDay: '',
             weekends: [6, 0],
             dateFormat: '',

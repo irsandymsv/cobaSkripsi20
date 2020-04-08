@@ -68,6 +68,11 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 	Route::get('/logout', 'Histogram2Controller@logout')->name('logout');
 	Route::get('/view_histogram', 'Histogram2Controller@view_histogram')->name('view_histogram');
 	Route::post('/show_histogram', 'Histogram2Controller@show_histogram')->name('show_histogram');
+
+	Route::get('/pemulihan_gambar', 'Histogram2Controller@pemulihan_gambar')->name('pemulihan_gambar');
+	Route::post('/send_recovery_email', 'Histogram2Controller@send_recovery')->name('send_recovery_email');
+	Route::get('/pemulihan_gambar/reset/{code}', 'Histogram2Controller@reset_cover')->name('reset_cover');
+	Route::post('/update_cover', 'Histogram2Controller@update_cover')->name('update_cover');
 });
 
 Route::prefix('test-image')->name('test_image.')->group(function()

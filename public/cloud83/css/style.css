@@ -1363,7 +1363,7 @@ ol {
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
 	.header-section {
-		padding: 35px 0px;
+		padding: 18px 0px;
 	}
 	.header-section .header-right {
 		position: fixed;
@@ -1552,7 +1552,7 @@ ol {
 
 @media only screen and (max-width: 767px) {
 	.header-section {
-		padding: 35px 0px;
+		padding: 18px 0px;
 	}
 	.header-section .header-right {
 		position: fixed;
