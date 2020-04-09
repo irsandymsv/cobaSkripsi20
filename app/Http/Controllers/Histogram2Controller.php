@@ -192,12 +192,11 @@ class Histogram2Controller extends Controller
          $recovery = recovery_image::create([
             'user_id' => $user->id
          ]);
-         $time = time();
-         $code = $time."-".$recovery->id;
-         $code = encrypt($code);
+         
+         $code = encrypt($recovery->id);
          MAil::to($request->input('email'))->send(new recoveryImage($code, $user->nama));
 
-         return redirect()->back()->with('email_send', 'Email pemulihan telah dikirimkan ke alamat email anda. Silahkan periksa email anda.')->withInput();
+         return redirect()->back()->with('email_send', 'Email pemulihan telah dikirimkan ke alamat email anda. Silahkan periksa kotak masuk email anda.')->withInput();
       }
       // $tgl = Carbon::createFromFormat('d F Y', $request->tgl_lahir, 'Asia/Jakarta');
 
@@ -205,14 +204,22 @@ class Histogram2Controller extends Controller
 
    public function reset_cover($code)
    {
-      $decode = decrypt($code);
-      echo $decode;
-      // return view('histogram2.reset_cover');
+      $recovery_id = decrypt($code);
+      $recovery = recovery_image::findOrFail($recovery_id);
+      $selisih_waktu = Carbon::now()->diffInMinutes(Carbon::parse($recovery->created_at));
+      $timeout = false;
+      if ($selisih_waktu > 30) {
+         $timeout = true;
+      }
+      return view('histogram2.reset_cover', [
+         'timeout' => $timeout,
+         'code' => $code
+      ]);
    }
 
    public function update_cover(Request $request)
    {
-
+      
    }
 
 

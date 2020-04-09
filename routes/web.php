@@ -73,6 +73,11 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 	Route::post('/send_recovery_email', 'Histogram2Controller@send_recovery')->name('send_recovery_email');
 	Route::get('/pemulihan_gambar/reset/{code}', 'Histogram2Controller@reset_cover')->name('reset_cover');
 	Route::post('/update_cover', 'Histogram2Controller@update_cover')->name('update_cover');
+
+	Route::get('/pemulihan_gambar/reset', function()
+	{
+		return redirect()->route('pemulihan_gambar');
+	});
 });
 
 Route::prefix('test-image')->name('test_image.')->group(function()
@@ -126,6 +131,7 @@ Route::get('/hash-image', function ()
 Route::get('/kripto', function ()
 {
 	$msg = "irsandymsv98@gmail.com password12345";
+	// $msg = 1;
 	$chip = encrypt($msg);
 	echo $chip."<br><br>";
 

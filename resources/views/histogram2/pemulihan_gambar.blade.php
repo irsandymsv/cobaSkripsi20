@@ -6,7 +6,7 @@
 @section("custom_css")
 <style type="text/css">
 	.top-index-bg{
-		/*padding: 250px 30px;*/
+		min-height: 600px;
 	}
 
 	.inner{
@@ -42,6 +42,12 @@
 	    width: 100%;
 	  }
 	}
+
+	@if (Session('email_send'))
+	#form_recovery{
+		display: none;
+	}
+	@endif
 </style>
 @endsection
 
@@ -50,13 +56,17 @@
 	<div class="top-index-bg">
 		<div class="inner">
 			@if (Session('email_send'))
+			<form>
 				<h3>Berhasil</h3>
-				<br>
+				<br><br>
 				<p>
-					{{ Session('email_send') }}
+					{{ Session('email_send') }} <br>
+					<span> Tidak menerima email? <a href="#" id="resend_link">Klik untuk Kirim ulang</a></span>
 				</p>
-			@else
-			<form action="{{ route('histogram2.send_recovery_email') }}" method="post">
+			</form>
+			@endif
+
+			<form id="form_recovery" action="{{ route('histogram2.send_recovery_email') }}" method="post">
 				@csrf
 				
 				<h3>Pemulihan Gambar</h3>
@@ -93,7 +103,6 @@
 
 				<button type="submit">Kirim</button>
 			</form>
-			@endif
 			
 		</div>
 	</div>
@@ -109,9 +118,15 @@
 <script type="text/javascript">
 	$(function() {
 		var dp1 = $('#dp1').datepicker().data('datepicker');
-		// var tgl = "22-05-2020";
-		// var tgl = tgl.split("-");
-		// dp1.selectDate(new Date(tgl[2] +"-"+ tgl[1] +"-"+ tgl[0]));
+		@if (Session('email_send'))
+		var tgl = "{{ old('tgl_lahir') }}";
+		var tgl = tgl.split("-");
+		dp1.selectDate(new Date(tgl[2] +"-"+ tgl[1] +"-"+ tgl[0]));
+
+		$("#resend_link").click(function(event) {
+			$("#form_recovery").submit();
+		});
+		@endif
 	});
 </script>
 @endsection

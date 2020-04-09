@@ -6,7 +6,7 @@
 @section("custom_css")
 <style type="text/css">
 	.top-index-bg{
-		/*padding: 250px 30px;*/
+		min-height: 600px;
 	}
 
 	.inner{
@@ -45,6 +45,15 @@
 <section class="hero-section">
 	<div class="top-index-bg">
 		<div class="inner">
+			@if ($timeout)
+				<form>
+					<h3>Timeout</h3>
+					<br><br>
+					<p>
+						Mohon maaf, batas waktu link pemulihan ini telah terlewati. Silahkan buat ulang permintaan pemulihan gambar melalui <a href="{{ route('histogram2.pemulihan_gambar') }}">Link berikut</a>
+					</p>
+				</form>
+			@else
 			<form action="{{ route('histogram2.update_cover') }}" method="post" enctype="multipart/form-data">
 				@csrf
 				
@@ -86,10 +95,13 @@
 						</span>
 					@endif
 				</div>
+
+				<input type="hidden" name="code" value="{{ $code }}">
 				<br><br>
 
 				<button type="submit">Simpan</button>
 			</form>
+			@endif
 		</div>
 	</div>
 </section>

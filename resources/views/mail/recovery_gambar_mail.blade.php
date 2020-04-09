@@ -34,7 +34,7 @@
 			</p>
 
 			<p>
-				Klik pada link di bawah untuk mengubah password dan mendapatkan gambar cover baru. Link tersebut hanya aktif selama 15 menit
+				Klik pada link di bawah untuk mengubah password dan mendapatkan gambar cover baru. Link tersebut hanya aktif selama 30 menit
 			</p>
 
 			<p>
