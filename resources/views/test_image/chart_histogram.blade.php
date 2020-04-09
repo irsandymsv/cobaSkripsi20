@@ -48,10 +48,8 @@
 	</div>
 
 	<script src="{{ asset('/js/jquery-3.4.1.min.js') }}"></script>
-	<!-- ChartJS -->
-	{{-- <script src="{{asset('/chart.js/Chart.js')}}"></script> --}}
 	<!-- New ChartJS -->
-	<script src="{{asset('/new_chart.js/Chart.bundle.min.js')}}"></script>
+	<script src="{{asset('/chart.js/Chart.bundle.min.js')}}"></script>
 	<script type="text/javascript">
 		$("#show_histo").click(function(event) {
 			event.preventDefault();

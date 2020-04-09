@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html>
 <head>
 	<title>Steganografi</title>
@@ -39,11 +39,39 @@
 			<br>
 		</div>
 	</div>
-	{{-- @if (count($histogram) > 0)
-		@for ($i = 0; $i < 256; $i++)
-			{{ $histogram[$i] }}<span>  </span>
-		@endfor	
-	@endif --}}
 	
 </body>
-</html>
+</html> --}}
+
+@extends('templates.user_panel')
+@section('page_title')
+Dashboard
+@endsection
+
+@section('content')
+<main>
+  <div class="container-fluid">
+    <h1 class="mt-4">Dashboard</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Dashboard</li>
+    </ol>
+
+    <div class="card mb-4">
+    	<div class="card-header"><i class="fas fa-image mr-2"></i>Gambar Cover</div>
+    	<div class="card-body">
+    		<button class="btn btn-outline-success btn-lg"><i class="fas fa-download mr-2"></i>Download</button>
+    	</div>
+    </div>
+
+    <div class="card mb-4">
+    	<div class="card-body">
+    		<h3>Selamat Datang</h3>
+    		<p>Nama User - Member sejak ...</p> 
+    	</div>
+    </div>
+  </div>
+</main>
+@endsection
+
+@section('script')
+@endsection

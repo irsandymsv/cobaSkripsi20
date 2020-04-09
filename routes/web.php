@@ -57,6 +57,8 @@ Route::prefix('histogram')->name('histogram.')->group(function()
 	Route::get('/logout', 'HistogramController@logout')->name('logout');
 });
 
+
+//Stegano Histogram Shifting2 (peak,zero disisipkan juga)
 Route::prefix('histogram2')->name('histogram2.')->group(function()
 {
 	Route::get('/', 'Histogram2Controller@index')->name('index');
