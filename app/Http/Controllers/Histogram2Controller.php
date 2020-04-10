@@ -261,6 +261,11 @@ class Histogram2Controller extends Controller
          $code = $request->input('code');
       }
 
+      //mendapatkan id recovery_image dan user yang terkait
+      $recovery_id = decrypt($code);
+      $recovery = recovery_image::findOrFail($recovery_id);
+      $user = User::findOrFail($recovery->user_id);
+
       $cover_photo = $request->file('cover_photo');
       $ekstensi = $cover_photo->getClientOriginalExtension();
       $image = '';
@@ -325,11 +330,6 @@ class Histogram2Controller extends Controller
          return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
       }
 
-      //mendapatkan id recovery_image dan user yang terkait
-      $recovery_id = decrypt($code);
-      $recovery = recovery_image::findOrFail($recovery_id);
-      $user = User::findOrFail($recovery->user_id);
-
       $hash_pass = Hash::make($password);
       $user->password = $hash_pass;
       $user->save();
@@ -342,7 +342,7 @@ class Histogram2Controller extends Controller
          $user->id
       );
 
-      Auth::login($new_user);
+      Auth::login($user);
       Session(['pemulihan_sukses' => 'Password dan gambar cover anda berhasil diperbarui.']);
       
       return redirect()->route('histogram2.dashboard');
@@ -665,7 +665,7 @@ class Histogram2Controller extends Controller
             $pesan_asli .= $char;
          }
 
-         // echo "tes: ".$key_LSB_asli;
+         // echo "tes: ".$overhead_info;
          // die();
 
          /*set LSB asli ke 16 pixel pertama
