@@ -118,11 +118,12 @@
 <script type="text/javascript">
 	$(function() {
 		var dp1 = $('#dp1').datepicker().data('datepicker');
-		@if (Session('email_send'))
-		var tgl = "{{ old('tgl_lahir') }}";
+
+		var tgl = @json(old('tgl_lahir'));
 		var tgl = tgl.split("-");
 		dp1.selectDate(new Date(tgl[2] +"-"+ tgl[1] +"-"+ tgl[0]));
 
+		@if (Session('email_send'))
 		$("#resend_link").click(function(event) {
 			$("#form_recovery").submit();
 		});

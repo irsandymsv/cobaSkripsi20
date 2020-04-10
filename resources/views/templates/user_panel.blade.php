@@ -35,7 +35,7 @@
             {{-- <a class="dropdown-item" href="#">Settings</a>
             <a class="dropdown-item" href="#">Activity Log</a> --}}
             {{-- <div class="dropdown-divider"></div> --}}
-            <a class="dropdown-item" href="#">Logout</a>
+            <a class="dropdown-item" id="logout_link" href="{{ route('histogram2.logout') }}">Logout</a>
           </div>
         </li>
       </ul>
@@ -67,11 +67,11 @@
           <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between small">
               <div class="text-muted">Copyright &copy; Your Website 2019</div>
-              <div>
+              {{-- <div>
                 <a href="#">Privacy Policy</a>
                 &middot;
                 <a href="#">Terms &amp; Conditions</a>
-              </div>
+              </div> --}}
             </div>
           </div>
         </footer>

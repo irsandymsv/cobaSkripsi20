@@ -94,6 +94,12 @@
 							<strong>{{ Session('gambar_tdk_cukup') }}</strong>
 						</span>
 					@endif
+
+					@if (Session('code_not_found'))
+						<span class="invalid-feedback" role="alert" style="color: red;">
+							<strong>{{ Session('code_not_found') }}</strong>
+						</span>
+					@endif
 				</div>
 
 				<input type="hidden" name="code" value="{{ $code }}">

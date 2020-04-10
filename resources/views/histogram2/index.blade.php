@@ -106,7 +106,7 @@
 								<div class="col-sm-6">
 									<label for="tgl_lahir">Tanggal Lahir</label>
 									<span class="lnr lnr-calendar-full"></span>
-									<input type="text" name="tgl_lahir" class="form-control datepicker-here" data-language='id' data-date-format="dd-mm-yyyy" id="dp1" autocomplete="off" value="{{ old('tgl_lahir') }}">
+									<input type="text" name="tgl_lahir" class="form-control datepicker-here" data-language='id' data-date-format="dd-mm-yyyy" id="dp1" autocomplete="off">
 
 									@error('tgl_lahir')
 										<span class="invalid-feedback" role="alert" style="color: red;">
@@ -177,6 +177,12 @@
 	$(function() {
 		var dp1 = $('#dp1').datepicker().data('datepicker');
 		// dp1.selectDate(new Date();
+
+		var old_tgl = @json(old('tgl_lahir'));
+		if (old_tgl != null){
+			var tgl = old_tgl.split("-");
+			dp1.selectDate(new Date(tgl[2] +"-"+ tgl[1] +"-"+ tgl[0]));
+		}
 	});
 </script>
 @endsection

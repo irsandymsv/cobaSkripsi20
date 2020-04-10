@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Storage;
 use App\User;
 use App\recovery_image;
 use Carbon\Carbon;
@@ -47,12 +48,12 @@ class Histogram2Controller extends Controller
    	}
 
    	//Buat histogram dari $image
-      echo "<br>";
    	$histogram = $this->makeHistogram($image);
-      for ($i=0; $i < 256; $i++) { 
-         echo $histogram[$i]." ";
-      }
-      echo "<br>";
+      
+      // for ($i=0; $i < 256; $i++) { 
+      //    echo $histogram[$i]." ";
+      // }
+      // echo "<br>";
 
    	//Tentukan Peak dan Zero
       $max_point = max($histogram);
@@ -67,9 +68,15 @@ class Histogram2Controller extends Controller
       }
 
       $password = $request->input('password');
-      $message = $request->input('email')." ".$password." ";
-      $bin_message = $this->stringToBin($message);
+      $message = $request->input('email')." ".$password;
+      $message_encrypt = encrypt($message); //Enkripsi email dan password
+      $msg_secret = $message_encrypt." ";
+      $bin_message = $this->stringToBin($msg_secret);
       $bin_msg_len = strlen($bin_message);
+
+      // echo "msg = ".$msg_secret."<br>";
+      // echo "last 2 char : ".substr($msg_secret, -2);
+      // die();
 
       //tentukan kapasitas image
       $overhead_len = 0; //jml pixel zero(jika ada) + pixel di sampingnya
@@ -96,16 +103,20 @@ class Histogram2Controller extends Controller
 
       $pure_payload = $max_point - ($overhead_len + $unused_key_pixel);
       if ($bin_msg_len > $pure_payload) {
-      	return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain');
+      	return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
       }
+      // echo "bin msg len: ".$bin_msg_len."<br>";
+      // echo "pure_payload: ".$pure_payload;
+      // die();
 
+      $tgl_parse = Carbon::parse($request->input('tgl_lahir'));
       $hash_pass = Hash::make($password);
       $new_user = User::create([
          "nama" => $request->input('nama'),
          "email" => $request->input('email'),
          "no_hp" => $request->input('no_hp'),
          "gender" => $request->input('gender'),
-         "tgl_lahir" => $request->input('tgl_lahir'),
+         "tgl_lahir" => $tgl_parse,
          "password" => $hash_pass
       ]);
 
@@ -117,13 +128,27 @@ class Histogram2Controller extends Controller
          $new_user->id
       );
 
-      $request->session()->flash('registrasi_sukses', 'Registrasi Berhasil');
+      Auth::login($new_user);
+      return redirect()->route('histogram2.dashboard');
+
+      // echo "message encrypt: ".$message_encrypt;
+   }
+
+   public function download_cover()
+   {
+      $user = Auth::user();
+      $is_exist = Storage::exists('user_cover/cover_photo-'.$user->id.'.png');
+      if ($is_exist) {
+         ob_end_clean();
+         $headers = array(
+             'Content-Type: image/png',
+         );
+         return response()->download(storage_path('app/public/user_cover/cover_photo-'.$user->id.'.png'), 'user_cover_image.png', $headers)->deleteFileAfterSend();
+      }
+      else{
+         return redirect()->back()->with('cover_not_found', 'Gambar cover tidak ditemukan atau sudah didownload sebelumnya.');
+      }
       
-      ob_end_clean();
-      $headers = array(
-          'Content-Type: image/png',
-      );
-      return response()->download(storage_path('app/public/user_cover/cover_photo-'.$new_user->id.'.png'), 'cover_photo-'.$new_user->id.'.png', $headers)->deleteFileAfterSend();
    }
 
    public function login()
@@ -154,7 +179,11 @@ class Histogram2Controller extends Controller
          return redirect()->back()->with('error_cover', "Gambar tidak dapat digunakan. Pastikan gambar yang digunakan adalah gambar cover yang didapat ketika registrasi");
       }
 
-      if (Auth::attempt(['email' => $user_info[0], 'password' => $user_info[1]])) {
+      //Dekrip email dan password 
+      $dekrip_pesan = decrypt($user_info);
+      $kredensial = explode(" ", $dekrip_pesan);
+
+      if (Auth::attempt(['email' => $kredensial[0], 'password' => $kredensial[1]])) {
          // Auth::login($user);
          // return redirect()->route('histogram2.dashboard');
          return redirect()->route('histogram2.dashboard');
@@ -219,14 +248,116 @@ class Histogram2Controller extends Controller
 
    public function update_cover(Request $request)
    {
+      $this->validate($request, [
+         "cover_photo" => "required|mimetypes:image/jpeg,image/png",
+         "password" => "required|string|max:12|min:6",
+      ]);
+
+      $code = '';
+      if (is_null($request->input('code'))) {
+         return redirect()->back()->with('code_not_found', 'Terjadi kesalahan. Harap buat permintaan pemulihan gambar lagi.');
+      }
+      else{
+         $code = $request->input('code');
+      }
+
+      $cover_photo = $request->file('cover_photo');
+      $ekstensi = $cover_photo->getClientOriginalExtension();
+      $image = '';
+      if ($ekstensi == "jpeg" || $ekstensi == "jpg") {
+         $image = imagecreatefromjpeg($cover_photo->path());
+      }
+      elseif ($ekstensi == "png") {
+         $image = imagecreatefrompng($cover_photo->path()); 
+      }
+
+      //Buat histogram dari $image
+      $histogram = $this->makeHistogram($image);
+
+      //Tentukan Peak dan Zero
+      $max_point = max($histogram);
+      $peak = array_search($max_point, $histogram);
+
+      $min_point = min($histogram);
+      $zero = array_search($min_point, $histogram); 
+
+      //Return back jika peak == zero
+      if ($peak == $zero) {
+         return redirect()->back()->with('peak_zero', 'Gambar tidak dapat digunakan, harap pilih gambar lain');
+      }
+
+      $password = $request->input('password');
+      $message = $user->email." ".$password;
+      $message_encrypt = encrypt($message); //Enkripsi email dan password
+      $msg_secret = $message_encrypt." ";
+      $bin_message = $this->stringToBin($msg_secret);
+      $bin_msg_len = strlen($bin_message);
+
+      // echo "msg = ".$msg_secret."<br>";
+      // echo "last 2 char : ".substr($msg_secret, -2);
+      // die();
+
+      //tentukan kapasitas image
+      $overhead_len = 0; //jml pixel zero(jika ada) + pixel di sampingnya
+      if ($min_point > 0) {
+         $overhead_len = $min_point;
+
+         if ($peak > $zero) {
+            $overhead_len += $histogram[$zero + 1];
+         }
+         else {
+            $overhead_len += $histogram[$zero - 1];
+         }
+      }
+
+      $unused_key_pixel = 0; //jmlh pixel peak yg tidak dapat digunakan utk embedding karena digunakan utk menyimpan binary key (peak n zero)
+      $yAxis=0;
+      for ($x=0; $x < 16; $x++) { 
+         $rgb = imagecolorat($image, $x, $yAxis);
+         $r = ($rgb >> 16) & 0xFF;
+         if ($r == $peak) {
+            $unused_key_pixel++;
+         }
+      }
+
+      $pure_payload = $max_point - ($overhead_len + $unused_key_pixel);
+      if ($bin_msg_len > $pure_payload) {
+         return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
+      }
+
+      //mendapatkan id recovery_image dan user yang terkait
+      $recovery_id = decrypt($code);
+      $recovery = recovery_image::findOrFail($recovery_id);
+      $user = User::findOrFail($recovery->user_id);
+
+      $hash_pass = Hash::make($password);
+      $user->password = $hash_pass;
+      $user->save();
+
+      $this->embedding(
+         $image, 
+         $peak, 
+         $zero, 
+         $bin_message, 
+         $user->id
+      );
+
+      Auth::login($new_user);
+      Session(['pemulihan_sukses' => 'Password dan gambar cover anda berhasil diperbarui.']);
       
+      return redirect()->route('histogram2.dashboard');
    }
 
 
    public function dashboard()
    {
-      // $histogram = [];
-      return view('histogram2.dashboard');
+      $user = Auth::user();
+      $is_exist = Storage::exists('user_cover/cover_photo-'.$user->id.'.png');
+      $cover_exist = false;
+      if ($is_exist) {
+         $cover_exist = true;
+      }
+      return view('histogram2.dashboard', ['cover_exist' => $cover_exist]);
    }
 
    public function logout()
@@ -265,20 +396,6 @@ class Histogram2Controller extends Controller
    {
       $width = imagesx($image);
       $height = imagesy($image);
-
-      //Buat Histogram
-      // $histogram = [];
-      // for ($i=0; $i <= 255; $i++) { 
-      //    $histogram[$i] = 0;
-      // }
-
-      // for ($y=0; $y < $height; $y++) { 
-      //    for ($x=0; $x < $width; $x++) { 
-      //       $rgb = imagecolorat($image, $x, $y);
-      //       $r = ($rgb >> 16) & 0xFF;
-      //       $histogram[$r]++;
-      //    }
-      // }
 
       //Tentukan frekuensi(jumlah pixel) untuk peak dan zero point
       // $max_point = $histogram[$peak];
@@ -345,8 +462,8 @@ class Histogram2Controller extends Controller
 
       /*Simpan LSB 16 pixel pertama ke bin_message. Ganti dg bin key (max/min index)
       */
-      echo "ganti LSB 16 pixel pertama dg binary max/min index <br>";
-      $lsb_asli = '';
+      // echo "ganti LSB 16 pixel pertama dg binary max/min index <br>";
+
       for ($y=0; $y < 1; $y++) { 
          for ($x=0; $x < 16; $x++) { 
             $rgb = imagecolorat($image, $x, $y);
@@ -508,7 +625,7 @@ class Histogram2Controller extends Controller
 
          
          /* NOTE: 
-         format $message = EMAIL[space]PASSWORD[sapce]OVERHEAD_INFO0000000...(karna message < dr max_point)
+         format $message = EMAIL+[space]+PASSWORD+[sapce]+OVERHEAD_INFO/LSB+0000000...(karna message < dr max_point jadinya 0000...)
          */
 
          //Ambil pesan asli dan overhead info (jika ada)
@@ -516,18 +633,15 @@ class Histogram2Controller extends Controller
          $pesan_asli = '';
          $overhead_info = '';
          $key_LSB_asli = '';
-         $space_count = 0;
+         // $space_count = 0;
          for ($i=0; ($i + 7) < $message_len; $i += 8) { 
             $bin_part = substr($bin_message, $i, 8);
             $char = pack('H*', dechex(bindec($bin_part)));
             // echo $char."<br>";   
 
             if ($char == " ") {
-               $space_count++;
-            }
-
-            if ($space_count == 2) { 
-               //setelah space ke dua adalah overhead info atau LSB
+               // echo "space found ";
+               //setelah space adalah overhead info atau LSB
 
                if ($min_point > 0) { //cek apakah ada Overhead Info
                   $mulai = $i + 8;
@@ -544,8 +658,15 @@ class Histogram2Controller extends Controller
                }
             }
 
+            // if ($space_count == 2) { 
+               
+            // }
+
             $pesan_asli .= $char;
          }
+
+         // echo "tes: ".$key_LSB_asli;
+         // die();
 
          /*set LSB asli ke 16 pixel pertama
          */
@@ -615,11 +736,16 @@ class Histogram2Controller extends Controller
                }
             }
          }
-         // imagedestroy($cover_photo);
+
          // $histogram = $this->makeHistogram($cover_photo);
-         $user_info = explode(" ", $pesan_asli);
-         // $user_info[] = $histogram;
-         return $user_info;
+         // for ($i=0; $i < 256; $i++) { 
+         //    echo $histogram[$i]." ";
+         // }
+         // echo "<br>";
+         // die();
+
+         // imagedestroy($cover_photo);
+         return $pesan_asli;
       } 
       catch (Exception $e) {
          return "error_cover";

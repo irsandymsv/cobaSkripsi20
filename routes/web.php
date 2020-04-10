@@ -66,8 +66,9 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 	Route::post('/store_user', 'Histogram2Controller@store_user')->name('store.user');
 	Route::get('/login', 'Histogram2Controller@login')->name('login');
 	Route::post('/checkLogin', 'Histogram2Controller@checkLogin')->name('checkLogin');
-	Route::get('/dashboard', 'Histogram2Controller@dashboard')->name('dashboard');
+	Route::get('/dashboard', 'Histogram2Controller@dashboard')->name('dashboard')->middleware('auth');
 	Route::get('/logout', 'Histogram2Controller@logout')->name('logout');
+	Route::get('/download_cover', 'Histogram2Controller@download_cover')->name('download_cover')->middleware('auth');
 	Route::get('/view_histogram', 'Histogram2Controller@view_histogram')->name('view_histogram');
 	Route::post('/show_histogram', 'Histogram2Controller@show_histogram')->name('show_histogram');
 
@@ -132,7 +133,7 @@ Route::get('/hash-image', function ()
 
 Route::get('/kripto', function ()
 {
-	$msg = "irsandymsv98@gmail.com password12345";
+	$msg = "bambangWk@gmail.com bamabngwk";
 	// $msg = 1;
 	$chip = encrypt($msg);
 	echo $chip."<br><br>";
