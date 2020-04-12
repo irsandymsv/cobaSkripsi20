@@ -402,7 +402,7 @@ ol {
 	background: rgba(0, 0, 0, 0.63);
 	padding: 16px 0px;
 	border-bottom: 2px solid #25ae88;
-	position: fixed;
+	position: absolute;
 	width: 100%;
 	left: 0;
 	top: 0;

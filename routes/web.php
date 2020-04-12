@@ -83,7 +83,7 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 	});
 });
 
-Route::prefix('test-image')->name('test_image.')->group(function()
+Route::prefix('test_image')->name('test_image.')->group(function()
 {
 	Route::get('/', 'testImageController@index')->name('index');
 	Route::post('/test', 'testImageController@test')->name('test');

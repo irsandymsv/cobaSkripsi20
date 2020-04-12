@@ -13,10 +13,10 @@ class testImageController extends Controller
 
 	public function test(Request $request)
 	{
-		$this->validate($request, [
-			'gambar1' => 'required|mimetypes:image/jpeg,image/png',
-			'gambar2' => 'required|mimetypes:image/jpeg,image/png',
-		]);
+		// $this->validate($request, [
+		// 	'gambar1' => 'required|mimetypes:image/jpeg,image/png',
+		// 	'gambar2' => 'required|mimetypes:image/jpeg,image/png',
+		// ]);
 
 		$gambar1 = $request->file('gambar1');
 		$gambar2 = $request->file('gambar2');
@@ -53,8 +53,10 @@ class testImageController extends Controller
    	}
    	$psnr = $this->getPSNR($mse);
 
-   	echo "MSE = ".$mse."<br>";
-   	echo "PSNR = ".$psnr."<br><br><br>";
+      $hasil = array('psnr' => $psnr, 'mse'=>$mse);
+   	return json_encode($hasil);
+      // echo "MSE = ".$mse."<br>";
+   	// echo "PSNR = ".$psnr."<br><br><br>";
 	}
 
 	private function getMSE($image1, $image2)
@@ -77,7 +79,7 @@ class testImageController extends Controller
    		}
    	}
 
-   	echo "<br> jmlh piksel error (kuadrat) = ".$temp."<br>";
+   	// echo "<br> jmlh piksel error (kuadrat) = ".$temp."<br>";
    	$mse = $temp / ($width * $height);
    	return $mse;
 	}

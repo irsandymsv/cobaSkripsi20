@@ -15,8 +15,8 @@
 	<!-- Stylesheets -->
 	<link rel="stylesheet" href="{{asset('/cloud83/css/bootstrap.min.css')}}"/>
 	<link rel="stylesheet" href="{{asset('/cloud83/css/font-awesome.min.css')}}"/>
-	<link rel="stylesheet" href="{{asset('/cloud83/css/magnific-popup.css')}}"/>
-	<link rel="stylesheet" href="{{asset('/cloud83/css/owl.carousel.min.css')}}"/>
+	{{-- <link rel="stylesheet" href="{{asset('/cloud83/css/magnific-popup.css')}}"/> --}}
+	{{-- <link rel="stylesheet" href="{{asset('/cloud83/css/owl.carousel.min.css')}}"/> --}}
 	<link rel="stylesheet" href="{{asset('/cloud83/css/style.css')}}"/>
 	<link rel="stylesheet" href="{{asset('/cloud83/css/animate.css')}}"/>
 
@@ -39,7 +39,7 @@
 	<link rel="stylesheet" href="{{asset('/regform-25/css/style.css')}}">
 
 	{{-- custom CSS --}}
-	@yield("custom_css")
+	
 	<style type="text/css">
 		.top-index-bg{
 			background-image: url('{{asset("/cloud83/img/bg.jpg")}}'); 
@@ -53,8 +53,13 @@
 			display: block;
 			font-size: 12px;
 		}
-	</style>
 
+		.main-menu li a:hover{
+			color: #25ae88;
+		}
+	</style>
+	
+	@yield("custom_css")
 </head>
 <body>
 	@yield("page_loader")
@@ -71,10 +76,10 @@
 			</div>
 			<div class="header-right">
 				<ul class="main-menu">
-					{{-- <li class="active"><a href="index.html">Home</a></li> --}}
-					{{-- <li><a href="about.html">About us</a></li>
-					<li><a href="service.html">Services</a></li>
-					<li><a href="blog.html">News</a></li>
+					<li><a href="{{ route('histogram2.index') }}">Home</a></li>
+					<li><a href="{{ route('histogram2.pemulihan_gambar') }}">Pemulihan Gambar</a></li>
+					<li><a href="{{ route('test_image.index') }}">Uji Kualitas</a></li>
+					{{-- <li><a href="blog.html">News</a></li>
 					<li><a href="contact.html">Contact</a></li> --}}
 				</ul>
 				<div class="header-btns">
