@@ -325,10 +325,21 @@ Pengujian Kualitas Gambar
 		})
 		.done(function(hasil) {
 			console.log("success");
-			console.log(hasil);
-			$("#nilai_psnr").text(hasil['psnr']);
-			$("#nilai_mse").text(hasil['mse']);
-			$("#card_hasil").show();
+			// console.log(hasil);
+			if (hasil['status'] == 'sukses') {
+				$("#nilai_psnr").text(hasil['psnr']);
+				$("#nilai_mse").text(hasil['mse']);
+				$("#card_hasil").show();	
+			}
+			else if (hasil['status'] == 'resolusi_berbeda') {
+				$("#error_msg").text(hasil['pesan']);
+				$("#error_msg").show();
+			}
+			else if(hasil['status'] == 'mse_0'){
+				$("#error_msg").text(hasil['pesan']);
+				$("#error_msg").show();	
+			}
+			
 		})
 		.fail(function() {
 			console.log("error");

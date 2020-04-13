@@ -169,6 +169,7 @@
 
 @section("script")
 <script src="{{asset('/regform-25/js/jquery-3.3.1.min.js')}}"></script>
+<script src="{{asset('/cloud83/js/circle-progress.min.js')}}"></script>
 <!-- DATE-PICKER -->
 <script src="{{asset('/regform-25/vendor/date-picker/js/datepicker.js')}}"></script>
 <script src="{{asset('/regform-25/vendor/date-picker/js/datepicker.en.js')}}"></script>

@@ -43,17 +43,29 @@ class testImageController extends Controller
    	$height1 = imagesy($image1);
    	$height2 = imagesy($image2);
    	if ($width1 != $width2 && $height1 != $height2) {
-   		return redirect()->back()->with('gambar_berbeda', 'Ukuran (resolusi) kedua gambar berbeda. Harap gunakan gambar yang sesuai');
+         $hasil = array(
+            'status' => "resolusi_berbeda",
+            'pesan' => "Ukuran (resolusi) kedua gambar berbeda. Harap gunakan gambar yang sesuai"
+         );
+         return json_encode($hasil);
    	}
 
    	$mse = $this->getMSE($image1, $image2);
    	if ($mse == 0) {
-   		echo "gambar identik. Tidak ditemukan perbedaan nilai kecerahan/keabuan (grey level) piksel <br>";
-   		die();
+         $hasil = array(
+            'status' => "mse_0",
+            'pesan' => "Tidak ditemukan perbedaan nilai kecerahan/keabuan (grey level). MSE = 0"
+         );
+         return json_encode($hasil);
    	}
+
    	$psnr = $this->getPSNR($mse);
 
-      $hasil = array('psnr' => $psnr, 'mse'=>$mse);
+      $hasil = array(
+         'status' => "sukses",
+         'psnr' => $psnr,
+         'mse'=>$mse
+       );
    	return json_encode($hasil);
       // echo "MSE = ".$mse."<br>";
    	// echo "PSNR = ".$psnr."<br><br><br>";

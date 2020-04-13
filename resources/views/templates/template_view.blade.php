@@ -14,7 +14,7 @@
 
 	<!-- Stylesheets -->
 	<link rel="stylesheet" href="{{asset('/cloud83/css/bootstrap.min.css')}}"/>
-	<link rel="stylesheet" href="{{asset('/cloud83/css/font-awesome.min.css')}}"/>
+	{{-- <link rel="stylesheet" href="{{asset('/cloud83/css/font-awesome.min.css')}}"/> --}}
 	{{-- <link rel="stylesheet" href="{{asset('/cloud83/css/magnific-popup.css')}}"/> --}}
 	{{-- <link rel="stylesheet" href="{{asset('/cloud83/css/owl.carousel.min.css')}}"/> --}}
 	<link rel="stylesheet" href="{{asset('/cloud83/css/style.css')}}"/>
@@ -30,7 +30,7 @@
 	<link rel="stylesheet" href="{{asset('/regform-25/fonts/linearicons/style.css')}}">
 
 	<!-- MATERIAL DESIGN ICONIC FONT -->
-	<link rel="stylesheet" href="{{asset('/regform-25/fonts/material-design-iconic-font/css/material-design-iconic-font.min.css')}}">
+	{{-- <link rel="stylesheet" href="{{asset('/regform-25/fonts/material-design-iconic-font/css/material-design-iconic-font.min.css')}}"> --}}
 
 	<!-- DATE-PICKER -->
 	<link rel="stylesheet" href="{{asset('/regform-25/vendor/date-picker/css/datepicker.min.css')}}">
@@ -214,9 +214,8 @@
 	<!--====== Javascripts & Jquery ======-->
 	<script src="{{asset('/cloud83/js/jquery-3.2.1.min.js')}}"></script>
 	<script src="{{asset('/cloud83/js/bootstrap.min.js')}}"></script>
-	<script src="{{asset('/cloud83/js/owl.carousel.min.js')}}"></script>
-	<script src="{{asset('/cloud83/js/jquery.magnific-popup.min.js')}}"></script>
-	<script src="{{asset('/cloud83/js/circle-progress.min.js')}}"></script>
+	{{-- <script src="{{asset('/cloud83/js/owl.carousel.min.js')}}"></script> --}}
+	{{-- <script src="{{asset('/cloud83/js/jquery.magnific-popup.min.js')}}"></script> --}}
 	<script src="{{asset('/cloud83/js/main.js')}}"></script>
 
 	@yield("script")
