@@ -79,7 +79,7 @@ Route::prefix('histogram2')->name('histogram2.')->group(function()
 
 	Route::get('/pemulihan_gambar/reset', function()
 	{
-		return redirect()->route('pemulihan_gambar');
+		return redirect()->route('histogram2.pemulihan_gambar');
 	});
 });
 
@@ -133,12 +133,17 @@ Route::get('/hash-image', function ()
 
 Route::get('/kripto', function ()
 {
-	$msg = "bambangWk@gmail.com bamabngwk";
+	$msg = "bambangWk@gmail.com bambangwk";
 	// $msg = 1;
-	$chip = encrypt($msg);
+	$chip = encrypt($msg)."-/-1234567";
 	echo $chip."<br><br>";
 
-	$real_msg = decrypt($chip);
+	$real_msg = '';
+	try {
+		$real_msg = decrypt($chip);
+	} catch (Exception $e) {
+		echo "dekripsi error!";
+	}
 	echo "dekripsi: "."<br>".$real_msg;
 	// try {
 	// } catch (DecryptException $e) {

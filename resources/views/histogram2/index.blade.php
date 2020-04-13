@@ -142,17 +142,17 @@
 										</span>
 									@enderror
 
-									@if (Session('peak_zero'))
+									@if (Session('error_found'))
 										<span class="invalid-feedback" role="alert" style="color: red;">
-											<strong>{{ Session('peak_zero') }}</strong>
+											<strong>{{ Session('error_found') }}</strong>
 										</span>
 									@endif
 
-									@if (Session('gambar_tdk_cukup'))
+									{{-- @if (Session('gambar_tdk_cukup'))
 										<span class="invalid-feedback" role="alert" style="color: red;">
 											<strong>{{ Session('gambar_tdk_cukup') }}</strong>
 										</span>
-									@endif
+									@endif --}}
 								</div>
 							</div>
 						</div>

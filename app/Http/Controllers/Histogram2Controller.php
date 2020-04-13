@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Storage;
 use App\User;
 use App\recovery_image;
 use Carbon\Carbon;
 use App\Mail\recoveryImage;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class Histogram2Controller extends Controller
 {
@@ -64,12 +64,12 @@ class Histogram2Controller extends Controller
 
       //Return back jika peak == zero
       if ($peak == $zero) {
-         return redirect()->back()->with('peak_zero', 'Gambar tidak dapat digunakan, harap pilih gambar lain');
+         return redirect()->back()->with('error_found', 'Gambar tidak dapat digunakan, harap pilih gambar lain');
       }
 
       $password = $request->input('password');
       $message = $request->input('email')." ".$password;
-      $message_encrypt = encrypt($message); //Enkripsi email dan password
+      $message_encrypt = encrypt($message); //Enkripsi kredensial (email dan password)
       $msg_secret = $message_encrypt." ";
       $bin_message = $this->stringToBin($msg_secret);
       $bin_msg_len = strlen($bin_message);
@@ -103,7 +103,7 @@ class Histogram2Controller extends Controller
 
       $pure_payload = $max_point - ($overhead_len + $unused_key_pixel);
       if ($bin_msg_len > $pure_payload) {
-      	return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
+      	return redirect()->back()->with('error_found', 'Gambar tidak cukup untuk menampung data, harap pilih gambar lain')->withInput();
       }
       // echo "bin msg len: ".$bin_msg_len."<br>";
       // echo "pure_payload: ".$pure_payload;
@@ -146,7 +146,7 @@ class Histogram2Controller extends Controller
          return response()->download(storage_path('app/public/user_cover/cover_photo-'.$user->id.'.png'), 'user_cover_image.png', $headers)->deleteFileAfterSend();
       }
       else{
-         return redirect()->back()->with('cover_not_found', 'Gambar cover tidak ditemukan atau sudah didownload sebelumnya.');
+         return redirect()->back()->with('error_found', 'Gambar cover tidak ditemukan atau sudah didownload sebelumnya.');
       }
       
    }
@@ -176,11 +176,15 @@ class Histogram2Controller extends Controller
       // dd($user_info);
 
       if ($user_info == "error_cover") {
-         return redirect()->back()->with('error_cover', "Gambar tidak dapat digunakan. Pastikan gambar yang digunakan adalah gambar cover yang didapat ketika registrasi");
+         return redirect()->back()->with('error_found', "Gambar tidak dapat digunakan. Pastikan gambar yang digunakan adalah gambar cover yang didapat ketika registrasi. Jika tetap gagal, gunakan fitur pemulihan gambar cover.");
       }
 
-      //Dekrip email dan password 
-      $dekrip_pesan = decrypt($user_info);
+      //Dekrip kredensial (email dan password) 
+      try {
+         $dekrip_pesan = decrypt($user_info);
+      } catch (\Exception $e) {
+         return redirect()->back()->with('error_found', "Dekripsi kredensial gagal. Harap pastikan gambar cover yang digunakan benar dan tidak rusak.");
+      }
       $kredensial = explode(" ", $dekrip_pesan);
 
       if (Auth::attempt(['email' => $kredensial[0], 'password' => $kredensial[1]])) {
@@ -189,7 +193,7 @@ class Histogram2Controller extends Controller
          return redirect()->route('histogram2.dashboard');
       }
       else{
-         return redirect()->back()->with('not_found', "Akun tidak ditemukan. Harap gunakan gambar cover yang anda dapat ketika registrasi.");
+         return redirect()->back()->with('user_not_found', "Akun tidak ditemukan. Harap gunakan gambar cover yang anda dapat ketika registrasi.");
       }
 
    }
@@ -215,7 +219,7 @@ class Histogram2Controller extends Controller
       ])->first();
 
       if (is_null($user)) {
-         return redirect()->back()->with('akun_tidak_ada', 'Akun tidak ditemukan. Harap periksa kembali email dan tanggal lahir yang anda masukkan')->withInput();
+         return redirect()->back()->with('user_not_found', 'Akun tidak ditemukan. Harap periksa kembali email dan tanggal lahir yang anda masukkan')->withInput();
       }
       else{
          $recovery = recovery_image::create([
@@ -233,10 +237,17 @@ class Histogram2Controller extends Controller
 
    public function reset_cover($code)
    {
-      $recovery_id = decrypt($code);
+      $timeout = false;
+      try {
+         $recovery_id = decrypt($code);
+      } catch (\Exception $e) {
+         $timeout = true;
+         Session(['error_dekripsi' => "Terjadi error, pastikan link yang anda gunakan benar."]);
+         return view('histogram2.reset_cover', ['timeout' => $timeout]);
+      }
       $recovery = recovery_image::findOrFail($recovery_id);
       $selisih_waktu = Carbon::now()->diffInMinutes(Carbon::parse($recovery->created_at));
-      $timeout = false;
+      
       if ($selisih_waktu > 30) {
          $timeout = true;
       }
@@ -255,14 +266,18 @@ class Histogram2Controller extends Controller
 
       $code = '';
       if (is_null($request->input('code'))) {
-         return redirect()->back()->with('code_not_found', 'Terjadi kesalahan. Harap buat permintaan pemulihan gambar lagi.');
+         return redirect()->back()->with('error_found', 'Terjadi kesalahan. Harap buat permintaan pemulihan gambar lagi.');
       }
       else{
          $code = $request->input('code');
       }
 
       //mendapatkan id recovery_image dan user yang terkait
-      $recovery_id = decrypt($code);
+      try {
+         $recovery_id = decrypt($code); 
+      } catch (\Exception $e) {
+         return redirect()->back()->with('error_found', 'pastikan link yang anda gunakan benar. Jika tetap mengalami error, harap buat ulang permintaan pemulihan gambar cover.')->withInput();
+      }
       $recovery = recovery_image::findOrFail($recovery_id);
       $user = User::findOrFail($recovery->user_id);
 
@@ -288,12 +303,12 @@ class Histogram2Controller extends Controller
 
       //Return back jika peak == zero
       if ($peak == $zero) {
-         return redirect()->back()->with('peak_zero', 'Gambar tidak dapat digunakan, harap pilih gambar lain');
+         return redirect()->back()->with('error_found', 'Gambar tidak dapat digunakan, harap pilih gambar lain');
       }
 
       $password = $request->input('password');
       $message = $user->email." ".$password;
-      $message_encrypt = encrypt($message); //Enkripsi email dan password
+      $message_encrypt = encrypt($message); //Enkripsi kredensial (email dan password)
       $msg_secret = $message_encrypt." ";
       $bin_message = $this->stringToBin($msg_secret);
       $bin_msg_len = strlen($bin_message);
@@ -327,7 +342,7 @@ class Histogram2Controller extends Controller
 
       $pure_payload = $max_point - ($overhead_len + $unused_key_pixel);
       if ($bin_msg_len > $pure_payload) {
-         return redirect()->back()->with('gambar_tdk_cukup', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
+         return redirect()->back()->with('error_found', 'Gambar tidak cukup untuk menampung data. Harap pilih gambar lain')->withInput();
       }
 
       $hash_pass = Hash::make($password);
@@ -747,7 +762,7 @@ class Histogram2Controller extends Controller
          // imagedestroy($cover_photo);
          return $pesan_asli;
       } 
-      catch (Exception $e) {
+      catch (\Exception $e) {
          return "error_cover";
       }
 

@@ -71,9 +71,9 @@ Dashboard
       </button>
     </div>
     @endif
-		@php
-			Session::forget('pemulihan_sukses');
-		@endphp
+	@php
+		Session::forget('pemulihan_sukses');
+	@endphp
 
     @if ($cover_exist)
     	<div class="card mb-4" id="download_card">
@@ -85,6 +85,15 @@ Dashboard
     			<a href="{{ route('histogram2.download_cover') }}" style="float: right;" class="btn btn-outline-success btn-lg" id="downlod_cover_btn"><i class="fas fa-download mr-2"></i>Download</a>
     		</div>
     	</div>
+    @endif
+
+    @if(Session('error_found'))
+    <div class="alert alert-warning alert-dismissible" role="alert">
+      <strong>Selamat!</strong> {{ Session('error_found') }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
     @endif
 
   </div>

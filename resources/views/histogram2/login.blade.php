@@ -103,15 +103,15 @@
 						</span>
 					@enderror
 
-					@if (Session('error_cover'))
+					@if (Session('error_found'))
 						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ Session('error_cover') }}</strong>
+							<strong>{{ Session('error_found') }}</strong>
 						</span>
 					@endif
 
-					@if (Session('not_found'))
+					@if (Session('user_not_found'))
 						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ Session('not_found') }}</strong>
+							<strong>{{ Session('user_not_found') }}</strong>
 						</span>
 					@endif
 				</div>
@@ -127,7 +127,7 @@
 				</div>
 				<br>
 				<div style="text-align: center;">
-					<span>Kehilangan gambar cover ? Gunakan <a href="{{ route('histogram2.pemulihan_gambar') }}">Recovery Gambar Cover</a> untuk mendapatkan gambar cover baru</span>
+					<span>Kehilangan gambar cover ? Gunakan <a href="{{ route('histogram2.pemulihan_gambar') }}">Pemulihan (recovery) Gambar Cover</a> untuk mendapatkan gambar cover baru</span>
 				</div>
 			</form>
 		</div>

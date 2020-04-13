@@ -45,69 +45,84 @@
 <section class="hero-section">
 	<div class="top-index-bg">
 		<div class="inner">
-			@if ($timeout)
+
+			@if (Session('error_dekripsi'))
 				<form>
-					<h3>Timeout</h3>
+					<h3>Error</h3>
 					<br><br>
 					<p>
-						Mohon maaf, batas waktu link pemulihan ini telah terlewati. Silahkan buat ulang permintaan pemulihan gambar melalui <a href="{{ route('histogram2.pemulihan_gambar') }}">Link berikut</a>
+						{{ Session('error_dekripsi') }}
 					</p>
 				</form>
+				@php
+					Session::forget('error_dekripsi');
+				@endphp		
 			@else
-			<form action="{{ route('histogram2.update_cover') }}" method="post" enctype="multipart/form-data">
-				@csrf
-				
-				<h3>Ubah Password</h3>
-				<p>
-					gambar cover baru akan dibuat ulang setelah anda memasukkan password dan pilih gambar baru. 
-				</p>
-				<div class="form-wrapper">
-					<label for="password">Password</label>
-					<input type="password" name="password" class="form-control">
+				@if ($timeout)
+					<form>
+						<h3>Timeout</h3>
+						<br><br>
+						<p>
+							Mohon maaf, batas waktu link pemulihan ini telah terlewati. Silahkan buat ulang permintaan pemulihan gambar melalui <a href="{{ route('histogram2.pemulihan_gambar') }}">Link berikut</a>
+						</p>
+					</form>
+				@else
+				<form action="{{ route('histogram2.update_cover') }}" method="post" enctype="multipart/form-data">
+					@csrf
+					
+					<h3>Ubah Password</h3>
+					<p>
+						gambar cover baru akan dibuat ulang setelah anda memasukkan password dan pilih gambar baru. 
+					</p>
+					<div class="form-wrapper">
+						<label for="password">Password</label>
+						<input type="password" name="password" class="form-control">
 
-					@error('password')
-						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ $message }}</strong>
-						</span>
-					@enderror
-				</div>
+						@error('password')
+							<span class="invalid-feedback" role="alert" style="color: red;">
+								<strong>{{ $message }}</strong>
+							</span>
+						@enderror
+					</div>
 
-				<div class="form-wrapper">
-					<label for="cover_photo">Pilih Gambar Cover</label>
-					<input type="file" class="form-control" name="cover_photo" accept="image/jpeg,image/png">
-					<small>Gambar ini akan digunakan sebagai media Log In</small>
+					<div class="form-wrapper">
+						<label for="cover_photo">Pilih Gambar Cover</label>
+						<input type="file" class="form-control" name="cover_photo" accept="image/jpeg,image/png">
+						<small>Gambar ini akan digunakan sebagai media Log In</small>
 
-					@error('cover_photo')
-						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ $message }}</strong>
-						</span>
-					@enderror
+						@error('cover_photo')
+							<span class="invalid-feedback" role="alert" style="color: red;">
+								<strong>{{ $message }}</strong>
+							</span>
+						@enderror
 
-					@if (Session('peak_zero'))
-						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ Session('peak_zero') }}</strong>
-						</span>
-					@endif
+						@if (Session('error_found'))
+							<span class="invalid-feedback" role="alert" style="color: red;">
+								<strong>{{ Session('error_found') }}</strong>
+							</span>
+						@endif
 
-					@if (Session('gambar_tdk_cukup'))
-						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ Session('gambar_tdk_cukup') }}</strong>
-						</span>
-					@endif
+						<input type="hidden" name="code" value="{{ $code }}">
 
-					@if (Session('code_not_found'))
-						<span class="invalid-feedback" role="alert" style="color: red;">
-							<strong>{{ Session('code_not_found') }}</strong>
-						</span>
-					@endif
-				</div>
+						{{-- @if (Session('gambar_tdk_cukup'))
+							<span class="invalid-feedback" role="alert" style="color: red;">
+								<strong>{{ Session('gambar_tdk_cukup') }}</strong>
+							</span>
+						@endif
 
-				<input type="hidden" name="code" value="{{ $code }}">
-				<br><br>
+						@if (Session('code_not_found'))
+							<span class="invalid-feedback" role="alert" style="color: red;">
+								<strong>{{ Session('code_not_found') }}</strong>
+							</span>
+						@endif --}}
+					</div>
+					<br><br>
 
-				<button type="submit">Simpan</button>
-			</form>
+					<button type="submit">Simpan</button>
+				</form>
+				@endif
 			@endif
+			
 		</div>
 	</div>
 </section>

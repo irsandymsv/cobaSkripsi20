@@ -94,9 +94,9 @@
 					@enderror
 				</div>
 
-				@if (Session('akun_tidak_ada'))
+				@if (Session('user_not_found'))
 					<span class="invalid-feedback" role="alert" style="color: red;">
-						<strong>{{ Session('akun_tidak_ada') }}</strong>
+						<strong>{{ Session('user_not_found') }}</strong>
 					</span>
 				@endif
 				<br><br>
